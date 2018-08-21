@@ -1,0 +1,93 @@
+<!-- Displayed when a VM is selected -->
+<div>
+
+	<h2><i class="fa fa-bolt"></i>&nbsp;Actions</h2>
+
+	<button class="button" v-on:click="showAction('createNetwork')">
+		<i class="fa fa-fw fa-plus"></i>&nbsp;Créer un réseau
+	</button>
+	
+	<button v-if="networkSelected" class="button" v-on:click="showAction('editNetwork')">
+		<i class="fa fa-fw fa-cogs"></i>&nbsp;Modifier le réseau
+	</button>
+
+	<button v-else class="button" disabled>
+		<i class="fa fa-fw fa-cogs"></i>&nbsp;Modifier le réseau
+	</button>
+	
+	<button v-if="networkSelected" class="button" v-on:click="showAction('deleteNetwork')">
+		<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le réseau
+	</button>
+
+	<button v-else class="button" disabled>
+		<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le réseau
+	</button>
+
+	
+	<div v-if="shown('deleteNetwork')">
+		<hr/>
+		<h3>Suppression du réseau</h3>
+		<p>
+			Êtes-vous sûr de vouloir supprimer ce réseau ? Cette action est irréversible.
+		</p>
+		<button v-sq-loader class="button-red" v-on:click="deleteNetwork">
+			<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le réseau
+		</button>
+	</div>
+
+	<div v-if="shown('createNetwork')">
+		<hr/>
+		<h3>Nouveau réseau</h3>
+		<label>Nom</label>
+		<input v-model="newNetwork.name" />
+
+		<label>Nombre de ports</label>
+
+		<div class="incrementable">
+			<input v-model="newNetwork.port_num" />
+			<button target="newNetwork.port_num" step="1" v-on:click="incrementField">
+				<i class="fa fa-plus"></i>
+			</button>
+			<button target="newNetwork.port_num" step="-1" v-on:click="incrementField">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+
+		<button v-sq-loader class="button-green" v-on:click="createNetwork">
+			<i class="fa fa-fw fa-sitemap"></i>&nbsp;Créer un réseau
+		</button>
+	</div>
+	
+	<div v-if="shown('editNetwork')">
+		<hr/>
+		<h3>Modifier le réseau</h3>
+		<label>Nom</label>
+		<input v-model="network.name" />
+
+		<label>Nombre de ports</label>
+
+		<div class="incrementable">
+			<input v-model="network.port_num" />
+			<button target="network.port_num" step="1" v-on:click="incrementField">
+				<i class="fa fa-plus"></i>
+			</button>
+			<button target="network.port_num" step="-1" v-on:click="incrementField">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+
+		<button v-sq-loader class="button-orange" v-on:click="editNetwork">
+			<i class="fa fa-fw fa-check"></i>&nbsp;Modifier
+		</button>
+	</div>
+
+</div>
+
+<!--
+<div v-if="networkSelected">
+selected
+</div>
+<div v-else>
+else
+</div>
+-->

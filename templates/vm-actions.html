@@ -1,0 +1,417 @@
+<!-- Displayed when a VM is selected -->
+<div v-if="vmSelected">
+	<h2><i class="fa fa-bolt"></i>&nbsp;Actions</h2>
+
+	<!-- Buttons changing with the power state of the VM, allows to create the 'CHANGING' state in which we wait for the VM to shutdown/boot -->
+
+	<button v-sq-loader class="button-red" v-if="vm.power_state === 'POWERED_ON'" v-on:click="shutdown">
+		<i class="fa fa-fw fa-power-off"></i> &nbsp;Éteindre
+	</button>
+	<button v-sq-loader class="button-green" v-if="vm.power_state === 'POWERED_OFF'" v-on:click="shutdown">
+		<i class="fa fa-fw fa-power-off"></i> &nbsp;Allumer
+	</button>
+
+	<button class="button-black" v-if="vm.power_state === 'POWERED_ON'" v-on:click="webconsole">
+		<i class="fa fa-fw fa-terminal"></i> &nbsp;Console d'administration
+	</button>
+
+	<button disabled v-if="vm.power_state === 'CHANGING'">
+		<i class="fa fa-fw fa-spin fa-circle-o-notch"></i> &nbsp;En cours
+	</button>
+
+	<button class="button" v-if="vm.power_state === 'POWERED_OFF'" v-on:click="showAction('deleteVM')">
+		<i class="fa fa-fw fa-trash"></i> &nbsp;Supprimer
+	</button>
+
+	<!-- Main buttons, always visible -->
+
+	<button class="button" v-on:click="showAction('settings')">
+		<i class="fa fa-fw fa-balance-scale"></i>&nbsp;Paramètres
+	</button>
+
+	<button class="button" v-on:click="showAction('snapshots')">
+		<i class="fa fa-fw fa-camera"></i>&nbsp;Snapshots
+	</button>
+
+	<button class="button" v-on:click="showAction('disks')">
+		<i class="fa fa-fw fa-database"></i>&nbsp;Disques
+	</button>
+
+	<button class="button" v-on:click="showAction('networks')">
+		<i class="fa fa-fw fa-sitemap"></i>&nbsp;Réseaux
+	</button>
+
+	<button class="button" v-if="!shown('more')" v-on:click="showAction('more')">
+		<i class="fa fa-fw fa-bars"></i>&nbsp;Plus ...
+	</button>
+
+	<div v-if="shown('more')">
+		<button class="button" v-on:click="showAction('clone')">
+			<i class="fa fa-fw fa-clone"></i>&nbsp;Cloner
+		</button>
+		<button v-sq-loader class="button" v-on:click="download">
+			<i class="fa fa-fw fa-download"></i>&nbsp;Exporter
+		</button>
+
+		<button class="button" v-on:click="showAction('template')">
+			<i class="fa fa-fw fa-archive"></i>&nbsp;VM préconfigurée
+		</button>
+	</div>
+
+	<!-- Sections displayed under main buttons when more options/actions are proposed -->
+
+	<!-- Template VM -->
+	<div v-if="shown('template')">
+		<hr/>
+		<h3>Création d'une VM préconfigurée</h3>
+		<label>Nom</label>
+		<input v-model="template.name" required/>
+		<label>Description</label>
+		<input v-model="template.desc" />
+		<button v-sq-loader class="button-green" v-on:click="createTemplate">
+			<i class="fa fa-archive"></i>
+			&nbsp;Créer la VM préconfigurée
+		</button>
+	</div>
+
+	<!-- Clone the VM -->
+	<div v-if="shown('clone')">
+		<hr/>
+		<h3>Cloner la VM</h3>
+		<label>Nom du clone</label>
+		<input v-model="clone.name" />
+		<!--<label>Description</label>
+		<input v-model="clone.description" />-->
+		<button v-sq-loader class="button-green" v-on:click="cloneVM">
+			<i class="fa fa-fw fa-clone"></i>
+			&nbsp;Cloner
+		</button>
+	</div>
+
+	<!-- Edit VM's networks -->
+	<div v-if="shown('networks')">
+		<hr/>
+		<h3>Réseaux</h3>
+
+		<label>Réseau sélectionné</label>
+		<select v-model="networks.newNetworkKey">
+			<option v-for="network in networks.available" v-bind:value="network.id">{{network.name}}</option>
+		</select>
+
+		<label>Interfaces</label>
+
+		<table class="networksActionList">
+
+			<tr>
+				<th>État</th>
+				<th>Réseau</th>
+				<th colspan="2">Actions</th>
+			</tr>
+
+			<tr v-for="nic in vm.nics">
+
+				<td class="networkStatusLED" v-bind:class="nic.displayState.state"><i class="fa fa-fw fa-plug"></i></td>
+
+				<td class="networkName" v-bind:title="nic.mac_address"> {{nic.backing.network_name}} </td>
+
+				<td v-sq-loader title="Connecter au réseau" class="networkAction edit" v-bind:class="enableNetworkPlugActionClass" v-on:click="connectNetwork(nic.key)"><i class="fa fa-fw fa-plug"></i></td>
+
+				<td v-sq-loader v-if="nic.state === 'CONNECTED'" title="Déconnecter" class="networkAction delete" v-on:click="disconnectNetwork(nic.key)"><i class="fa fa-fw fa-times"></i></td>
+				<td v-sq-loader v-else title="Supprimer l'interface" class="networkAction delete" v-on:click="deleteNetworkInterface(nic.key)"><i class="fa fa-fw fa-trash"></i></td>
+
+			</tr>
+		</table>
+
+		<hr/>
+
+		<button v-sq-loader class="button" v-on:click="createNetworkInterface">
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Ajouter une interface
+		</button>
+
+	</div>
+
+	<!-- Manage disks -->
+	<div v-if="shown('disks')">
+		<hr/>
+		<h3>Disques</h3>
+
+		<label>Disque séléctionné</label>
+
+		<select v-model="disks.selected" v-on:change="updateDisplayDisks">
+			<option v-for="disk in vm.disks" v-bind:value="disk.key">{{disk.label}}</option>
+		</select>
+
+		<label>Capacité (MiB)</label>
+
+		<div v-if="disks.selected" class="incrementable">
+
+			<input v-model="disks.capacity"/>
+
+			<button target="disks.capacity" step="1024" v-on:click="incrementField">
+				<i class="fa fa-plus"></i>
+			</button>
+
+			<button target="disks.capacity" step="-1024" v-on:click="incrementField">
+				<i class="fa fa-minus"></i>
+			</button>
+
+		</div>
+
+		<div v-else class="incrementable">
+			<input placeholder="Sélectionnez un disque" disabled/>
+			<button>
+				<i class="fa fa-plus"></i>
+			</button>
+			<button>
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+
+		<div v-if="disks.selected">
+			<button v-sq-loader class="button-orange" v-on:click="enlargeDisk">
+				<i class="fa fa-fw fa-check"></i>&nbsp;Agrandir le disque
+			</button>
+
+			<button v-sq-loader class="button-red" v-on:click="deleteDisk">
+				<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le disque
+			</button>
+		</div>
+
+		<div v-else>
+			<button class="button" disabled>
+				<i class="fa fa-fw fa-check"></i>&nbsp;Agrandir le disque
+			</button>
+
+			<button class="button" disabled>
+				<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le disque
+			</button>
+		</div>
+
+		<button class="button" v-on:click="showAction('newDisk')">
+			<i v-if="shown('newDisk')" class="fa fa-fw fa-minus"></i>
+			<i v-else class="fa fa-fw fa-plus"></i>
+			&nbsp;Créer un disque
+		</button>
+
+		<div v-if="shown('newDisk')">
+			<hr/>
+
+			<h4>Nouveau disque</h4>
+
+			<label>Nom VMDK</label>
+			<input v-model="disks.new.name" />
+
+			<label>Capacité (MiB)</label>
+			<div class="incrementable">
+
+				<input v-model="disks.new.capacity"/>
+
+				<button target="disks.new.capacity" step="1024" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+
+				<button target="disks.new.capacity" step="-1024" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+
+			</div>
+
+			<button v-sq-loader class="button-green" v-on:click="createDisk">
+				<i class="fa fa-fw fa-database"></i>&nbsp;Créer un disque
+			</button>
+		</div>
+	</div>
+
+	<!-- Manage snapshots -->
+	<div v-if="shown('snapshots')">
+		<hr/>
+		<h3>Snapshots</h3>
+		<p>
+			Les snapshots sont des instantanées d'une VM pour conserver son état à un moment donné.
+		</p>
+
+		<label>Snapshot séléctionné</label>
+
+		<select v-model="snapshots.selected">
+			<option v-for="snapshot in snapshots.list" v-bind:value="snapshot.id">{{snapshot.name}}</option>
+		</select>
+
+		<button v-sq-loader v-if="snapshots.selected" class="button-orange" v-on:click="revertSnapshot">
+			<i class="fa fa-fw fa-history"></i>&nbsp;Revenir au snapshot
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-history"></i>&nbsp;Revenir au snapshot
+		</button>
+
+		<button v-sq-loader v-if="snapshots.selected" class="button-red" v-on:click="deleteSnapshot">
+			<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le snapshot
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer le snapshot
+		</button>
+		<button v-if="snapshots.selected" class="button" v-on:click="showAction('newVMFromSnapshot')">
+			<i v-if="shown('newVMFromSnapshot')" class="fa fa-fw fa-minus"></i>
+			<i v-else class="fa fa-fw fa-plus"></i>&nbsp;Créer une VM depuis le snapshot
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Créer une VM depuis le snapshot
+		</button>
+
+		<button class="button" v-on:click="showAction('newSnapshot')">
+			<i v-if="shown('newSnapshot')" class="fa fa-fw fa-minus"></i>
+			<i v-else class="fa fa-fw fa-plus"></i>
+			&nbsp;Créer un snapshot
+		</button>
+		<div v-if="shown('newVMFromSnapshot')">
+			<hr/>
+			<h3>Nouvelle VM</h3>
+			<label>Nom de la VM</label>
+			<input v-model="newVMFromSnapshot.name" />
+			<!--<label>Description</label>
+			<input v-model="newVMFromSnapshot.desc" />-->
+			<button v-sq-loader class="button-green" v-on:click="createVMSnapshot">
+				<i class="fa fa-fw fa-clone"></i>
+				&nbsp;Créer VM
+			</button>
+		</div>
+		<div v-if="shown('newSnapshot')">
+			<hr/>
+
+			<h4>Nouveau snapshot</h4>
+
+			<label>Nom</label>
+			<input v-model="snapshots.new.name" />
+			<label>Description</label>
+			<input v-model="snapshots.new.description" />
+
+			<button v-sq-loader class="button" v-on:click="takeSnapshot">
+				<i class="fa fa-fw fa-camera"></i>&nbsp;Prendre un snapshot
+			</button>
+		</div>
+
+	</div>
+
+	<!-- Delete the VM -->
+	<div v-if="shown('deleteVM')">
+		<hr/>
+		<h3>Suppression de la machine virtuelle</h3>
+		<p>
+			Êtes-vous sûr de vouloir supprimer cette VM ? Cette action est irréversible.
+		</p>
+		<button v-sq-loader class="button-red" v-on:click="deleteVM">
+			<i class="fa fa-fw fa-trash"></i>&nbsp;Supprimer la VM
+		</button>
+	</div>
+
+	<!-- Edit various parameters (CPU, RAM, name, description) -->
+	<div v-if="shown('settings')">
+		<hr/>
+		<div>
+			<h3>Modification des paramètres de la VM</h3>
+
+			<label>Nom</label>
+			<input v-model="newVmInfo.name" />
+
+			<!--<label>Description</label>
+			<input v-model="newVmInfo.desc" />-->
+
+			<label>CPU(s)</label>
+
+			<div class="incrementable">
+				<input v-model="newVmInfo.cpu_count" />
+				<button target="newVmInfo.cpu_count" step="1" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="newVmInfo.cpu_count" step="-1" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<label>RAM (MiB)</label>
+			<div class="incrementable">
+				<input v-model="newVmInfo.memory_size" />
+				<button target="newVmInfo.memory_size" step="1024" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="newVmInfo.memory_size" step="-1024" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<button v-sq-loader class="button-orange" v-on:click="changeSetting">
+				<i class="fa fa-fw fa-check"></i>&nbsp;Modifier les paramètres
+			</button>
+
+			<button class="button-red" v-on:click="resetSetting">
+				<i class="fa fa-fw fa-undo"></i>&nbsp;Valeurs par défaut
+			</button>
+
+		</div>
+	</div>
+</div>
+
+<!-- Displayed when no VM is selected -->
+<div v-else>
+
+	<h2><i class="fa fa-bolt"></i>&nbsp;Actions</h2>
+	<button class="button" v-on:click="showAction('createVM')">
+		<i v-if="shown('createVM')" class="fa fa-fw fa-minus"></i>
+		<i v-else class="fa fa-fw fa-plus"></i>&nbsp;Créer une VM
+	</button>
+
+	<button class="button" v-on:click="showAction('createVMPreconfig')">
+		<i v-if="shown('createVMPreconfig')" class="fa fa-fw fa-minus"></i>
+		<i v-else class="fa fa-fw fa-plus"></i>&nbsp;Créer une VM préconfigurée
+	</button>
+
+	<div v-if="shown('createVMPreconfig')">
+		<hr/>
+		<div>
+			<h3>Nouvelle VM Préconfiguré</h3>
+
+			<label>Nom de la VM</label>
+
+			<select v-model="VMsPreconfigs.selected">
+				<option v-for="list in VMsPreconfigs.lists" v-bind:value="list.vm">{{list.name}}</option>
+			</select>
+
+			<label>Nouveau nom</label>
+			<input v-model="newVMFromTemplate.name"/>
+			<label>Description</label>
+			<input v-model="newVMFromTemplate.desc"/>
+
+			<button v-sq-loader class="button-green" v-on:click="createVmFromTemplate">
+				<i class="fa fa-fw fa-desktop"></i>&nbsp;Créer la machine virtuelle préconfiguré
+			</button>
+
+		</div>
+
+	</div>
+	<!-- Create a new VM -->
+	<div v-if="shown('createVM')">
+		<hr/>
+		<div>
+			<h3>Nouvelle VM</h3>
+
+			<label>Nom de la VM</label>
+			<input v-model="newVM.name"/>
+
+			<label>Fichier (OVA, ISO)</label>
+			<input type="file" v-on:change="FileSelect"/>
+
+			<div v-if="newVM.type !== ''" id="vm-upload-progress">
+				<label>Progression</label>
+				<vsqprogress></vsqprogress>
+			</div>
+
+			<button v-sq-loader class="button-green" v-on:click="createVM">
+				<i class="fa fa-fw fa-desktop"></i>&nbsp;Créer la machine virtuelle
+			</button>
+
+		</div>
+	</div>
+
+</div>

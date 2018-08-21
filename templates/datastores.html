@@ -1,0 +1,28 @@
+<loader v-if="model.length === 0"></loader>
+
+<ul v-else class="main-item-list" id="datastores-list">
+	<li v-for="datastore in model">
+		<div class="name">
+			{{ datastore.displayName }}
+		</div>
+		<i class="fa fa-database fa-3x"></i>
+
+		<table>
+
+			<tr class="fstype" v-bind:class="">
+				<td><i class="fa fa-fw fa-files-o"></i>&nbsp;</td>
+				<td>{{ datastore.type }}</td>
+			</tr>
+			<tr class="capacity" v-bind:class="">
+				<td><i class="fa fa-fw fa-pie-chart"></i>&nbsp;</td>
+				<td>{{ datastore.used }} sur {{ datastore.capacity }}</td>
+			</tr>
+			<tr class="usage" :style="datastore.progressBar">
+
+				<td><i class="fa fa-fw fa-hdd-o"></i>&nbsp;</td>
+				<td><!--<div v-bind:class="datastore.stateBgClass" v-bind:style="{ width: datastore.usage + '%' }" class="progress-bar"></div>--><span>{{ datastore.usage }} %</span></td>
+			</tr>
+		</table>
+
+	</li>
+</ul>

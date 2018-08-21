@@ -1,0 +1,59 @@
+<div class="header-wrapper">
+	<div class="app-header">
+		<h2>vSquare</h2>
+		<p>
+			Bienvenue dans vSquare, vous pouvez gérer vos ressources de virtualisation via le menu.
+		</p>
+	</div>
+	<ul id="main-dash-menu">
+		<li v-on:click="loadApp('vms')">
+			<p>
+				<i class="fa fa-home"></i>
+			</p>
+			<p>
+				VMs
+			</p>
+		</li>
+		<li v-on:click="loadApp('groups')">
+			<p>
+				<i class="fa fa-users"></i>
+			</p>
+			<p>
+				Groupes
+			</p>
+		</li>
+		<li v-on:click="loadApp('networks')">
+			<p>
+				<i class="fa fa-sitemap"></i>
+			</p>
+			<p>
+				Réseaux
+			</p>
+		</li>
+		<li v-on:click="loadApp('hypervisors')">
+			<p>
+				<i class="fa fa-server"></i>
+			</p>
+			<p>
+				Hyperviseurs
+			</p>
+		</li>
+		<li v-on:click="loadApp('datastores')">
+			<p>
+				<i class="fa fa-database"></i>
+			</p>
+			<p>
+				Datastores
+			</p>
+		</li>
+		<li v-on:click="loadApp('logs')">
+			<p>
+				<i class="fa fa-align-left"></i>
+			</p>
+			<p>
+				Journaux
+			</p>
+		</li>
+	</ul>
+
+</div>

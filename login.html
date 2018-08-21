@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<script src="res/vue.js"></script>
+		<script src="res/jquery-3.3.1.min.js"></script>
+		<script src="scripts/cookies.js"></script>
+		<script src="scripts/globals.js"></script>
+		<link rel="stylesheet" type="text/css" href="style/login.css">
+		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="style/fa/css/font-awesome.min.css"/>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+
+		<title>vSquare | Login</title>
+	</head>
+	<body>
+
+		<div id="app-login">
+			<div class="wrapper" v-on:keyup.enter="login">
+				<img id="logo" src="style/vsquaresquare.png" alt="logo vsquare"/>
+				<h1>vSquare</h1>
+				<div class="input_wrapper">
+					<input id="login" v-model="username" placeholder="Login" autofocus/>
+					<span class="input-focus"></span>
+				</div>
+				<div class="input_wrapper">
+					<input id="password" v-model="password" placeholder="Password"  type="password"/>
+					<span class="input-focus"></span>
+				</div>
+				<div id="button_submit">
+					<button v-html="submitButtonContent" v-on:click="login"></button>
+				</div>
+
+				<div id="notification" v-if="showNotif">
+					{{notification}}
+				</div>
+			</div>
+
+		</div>
+
+	</body>
+	<script src="scripts/login.js"></script>
+</html>

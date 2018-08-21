@@ -1,0 +1,127 @@
+<loader v-if="loading"></loader>
+
+<div v-else>
+	<div v-if="showvmdetails" id="vm-details">
+		<div v-on:click="close" class="close">
+			<i class="fa fa-times"></i>
+		</div>
+
+		<div class="vmd vm-name">
+			<i class="fa fa-server"></i>{{vmdetails.name}}
+		</div>
+
+		<div v-bind:class="vmdetails.displayPower.state" class="vmd vm-power">
+			<i class="fa fa-fw fa-power-off"></i>{{vmdetails.displayPower.text}}
+		</div>
+
+		<div class="vmd vm-os">
+			<!--<i class="fa fa-fw fa-desktop"></i>{{vmdetails.displayOS}}-->
+			<img class="fa fa-fw" v-bind:src="'res/vbox_icons/' + vmdetails.guest_OS_icon + '.png'"/>{{vmdetails.guest_OS_name}}
+		</div>
+
+		<div class="vmd vm-hardware">
+			<i class="fa fa-fw fa-microchip"></i>{{vmdetails.cpu.count}} CPU / {{vmdetails.displayMemory}} RAM
+		</div>
+		<table>
+			<tr>
+				<td>
+				<div>
+					<h3>Disques</h3>
+					<ul>
+						<li v-for="disk in vmdetails.disks">
+
+							<p>
+								<i class="fa fa-fw fa-database"></i>{{disk.label}}
+							</p>
+							<p>
+								</i>{{disk.displayCapacity}}
+							</p>
+							<p>
+								</i>{{disk.displayBacking}}
+							</p>
+
+						</li>
+						<li v-if="!vmdetails.disks.length">
+							<p>
+								<i class="fa fa-fw fa-database"></i>Aucun disque associé à la machine.
+							</p>
+							<p>
+								Vous pouvez en créer un à droite.
+							</p>
+						</li>
+					</ul>
+				</div></td>
+				<td>
+				<div>
+					<h3>Réseaux</h3>
+					<ul>
+						<li v-for="nic in vmdetails.nics">
+
+							<p>
+								<i class="fa fa-fw fa-sitemap"></i>{{nic.label}}
+							</p>
+							<p v-bind:class="nic.displayState.state">
+								{{nic.displayState.text}}
+							</p>
+							<p>
+								{{nic.backing.network_name}}
+							</p>
+							<p>
+								{{nic.mac_address}}
+							</p>
+
+						</li>
+						<li v-if="!vmdetails.nics.length">
+							<p>
+								<i class="fa fa-fw fa-sitemap"></i>Aucune interface réseau.
+							</p>
+							<p>
+								Vous pouvez en ajouter une à droite.
+							</p>
+						</li>
+					</ul>
+				</div></td>
+			</tr>
+		</table>
+	</div>
+
+	<div v-if="empty" class="header-wrapper main-item-list" id="vms-list">
+
+		<div class="empty-notice app-header">
+			<h2>Il n'y a rien ici</h2>
+
+			<p>
+				<i class="fa fa-warning"></i>&nbsp;&nbsp;Aucune machine virtuelle dans le groupe séléctionné&nbsp;&nbsp;<i class="fa fa-warning"></i>
+			</p>
+
+		</div>
+	</div>
+	<ul v-else class="main-item-list" id="vms-list">
+		<li v-bind:x-vm-id="vm.vm" v-on:click="loadVm(vm.vm)" class="clickable-item" v-for="vm in model">
+			<div class="name">
+				{{ vm.name }}
+			</div>
+			<i class="fa fa-desktop fa-3x"></i>
+
+			<table>
+				<tr class="ip">
+					<td><i class="fa fa-fw fa-id-card-o"></i>&nbsp;</td>
+					<td>{{ vm.vm }}</td>
+				</tr>
+				<tr class="power" v-bind:class="vm.displayPower.state">
+					<td><i class="fa fa-fw fa-power-off"></i>&nbsp;</td>
+					<td>{{ vm.displayPower.text }}</td>
+				</tr>
+
+				<tr>
+					<td><i class="fa fa-fw fa-user-circle-o"></i>&nbsp;</td>
+					<td>{{ vm.user.common_name }}</td>
+				</tr>
+
+			</table>
+
+		</li>
+
+	</ul>
+
+</div>

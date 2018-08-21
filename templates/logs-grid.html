@@ -1,0 +1,26 @@
+<div>
+	<table class="logs-grid">
+		<thead>
+		<tr>
+			<th v-for="key in columns">
+				<span v-if="key !== 'action' && key !== 'object_type'">
+					{{ misc.humanize.eventColumns[key] }}
+				</span>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr v-for="entry in data">
+			<td :class="{isType : key == 'action' || key == 'object_type', error:key == 'error'}" v-for="key in columns">
+				<span v-if="key === 'action'"> <i v-bind:title="misc.humanize.eventType[entry[key]]" v-bind:class="misc.html.eventTypeIcon[entry[key]]"></i> </span>
+				<span v-else-if="key === 'objectType'"> <i v-bind:title="misc.humanize.eventObject[entry[key]]" v-bind:class="misc.html.eventObjectIcon[entry[key]]"></i> </span>
+				<span v-else-if="key === 'creation_date'" v-bind:title="date.reformatDate(entry[key])">{{date.prettyDate(entry[key])}}</span>
+				<span v-else-if="key === 'error'" title="Copier dans le presse-papier" @click="copyText(entry[key])">{{entry[key]}}</span>
+				<span v-else>{{entry[key]}}</span>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+
+

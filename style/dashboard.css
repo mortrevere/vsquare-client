@@ -1,0 +1,46 @@
+#app-dashboard {
+	background-color:#e6e6e6;
+	width:60%;
+	margin:auto;
+}
+
+.vm-infos {
+	width: 150px;
+	display: inline-block;
+	border: 1px solid #827ffe;
+	vertical-align: middle;
+	padding: 12px;
+	text-align: center;
+	margin: 24px;
+	height: 150px;
+	border-radius: 3px;
+	background-color:#fff;
+}
+
+.vm-infos .vm-state-ok {
+	border: 1px solid #827ffe;
+}
+
+.vm-infos .vm-state-ok .vm-icon {
+	
+} 
+
+.vm-infos .vm-title, .vm-infos .vm-disk, .vm-infos .vm-ram {
+	width:100%;
+	display:block;
+}
+
+.vm-infos .vm-icon {
+	margin-bottom:12px;
+	color:#827ffe;
+}
+
+.vm-infos .vm-title {
+	font-size: 20px;
+	color: #403866;
+	line-height: 1.2;
+	text-align: center;
+	width: 100%;
+	display: block;
+	margin-bottom: 24px;
+}

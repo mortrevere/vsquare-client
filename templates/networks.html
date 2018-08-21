@@ -1,0 +1,43 @@
+<loader v-if="loading"></loader>
+
+<div v-else>
+	<div v-if="empty" class="header-wrapper main-item-list" id="vms-list">
+
+		<div class="empty-notice app-header">
+			<h2>Il n'y a rien ici</h2>
+
+			<p>
+				<i class="fa fa-warning"></i>&nbsp;&nbsp;Aucun réseau trouvé&nbsp;&nbsp;<i class="fa fa-warning"></i>
+			</p>
+
+		</div>
+	</div>
+	<ul v-else class="main-item-list" id="vms-list">
+		 
+		<li class="clickable-item" v-for="network in model" v-on:click="loadNetwork(network.id)">
+			<div class="name">
+				{{ network.name }}
+			</div>
+			<i class="fa fa-sitemap fa-3x"></i>
+
+			<table>
+				<tr class="ip">
+					<td><i class="fa fa-fw fa-id-card-o"></i>&nbsp;</td>
+					<td>{{ network.network }}</td>
+				</tr>
+				<tr>
+					<td><i class="fa fa-fw fa-calendar-plus-o"></i>&nbsp;</td>
+					<td>{{ network.displayCreationDate }}</td>
+				</tr>
+				<tr>
+					<td><i class="fa fa-fw fa-tty"></i>&nbsp;</td>
+					<td>{{ network.port_num }} ports</td>
+				</tr>
+
+			</table>
+
+		</li>
+
+	</ul>
+
+</div>

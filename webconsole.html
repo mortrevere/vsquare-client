@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>Console</title>
+		<link rel="stylesheet" type="text/css" href="res/wmks/wmks-all.css" />
+
+		<script src="res/vue.js"></script>
+		<script src="res/jquery-3.3.1.min.js"></script>
+		<script src="scripts/cookies.js"></script>
+		<script src="scripts/globals.js"></script>
+		<script src="res/wmks/jquery.js"></script>
+		<script src="res/wmks/jquery-ui.min.js"></script>
+		<script src="res/wmks/wmks.min.js"></script>
+		<script src="res/notify.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" href="style/webconsole.css" />
+	</head>
+	<body>
+
+		<div id="app-vsquare">
+			<nav>
+				<img v-on:click="home" alt="logo" src="style/vsquareclem.png"/>
+				<h1 v-on:click="home" >vSquare</h1>
+
+				<div id="logout" v-on:click="quit" title="Deconnexion">
+					<span>Déconnexion</span>
+					<i class="fa fa-sign-out"></i>
+				</div>
+			</nav>
+
+			<div id="helpers">
+				<div>
+					<button v-on:click="sendFunctionKey">
+						Envoyer Ctrl + Alt +
+					</button>
+					<select v-on:change="sendFunctionKey" v-model="functionKeyCode">
+						<option value="46">Suppr</option>
+						<option value="112">F1</option>
+						<option value="113">F2</option>
+						<option value="114">F3</option>
+						<option value="115">F4</option>
+						<option value="116">F5</option>
+						<option value="117">F6</option>
+						<option value="118">F7</option>
+						<option value="119">F8</option>
+						<option value="120">F9</option>
+						<option value="121">F10</option>
+						<option value="122">F11</option>
+						<option value="123">F12</option>
+					</select>
+				</div>
+				<div>
+					<button v-on:click="sendControlKey">
+						Envoyer Ctrl +
+					</button>
+					<input v-model="controlKeyCode"/>
+				</div>
+
+			</div>
+
+		</div>
+
+		<div id="container"></div>
+
+		<script src="scripts/webconsole.js"></script>
+	</body>
+</html>

@@ -1,0 +1,347 @@
+<div>
+	<h2><i class="fa fa-bolt"></i>&nbsp;Actions</h2>
+
+	<button class="button" v-on:click="showAction('createGroup')">
+		<i class="fa fa-fw fa-plus"></i>&nbsp;Créer un groupe
+	</button>
+
+	<button v-if="groupSelected" class="button" v-on:click="showAction('editGroup')">
+		<i class="fa fa-fw fa-cogs"></i>&nbsp;Modifier le groupe
+	</button>
+
+	<button v-else class="button" disabled>
+		<i class="fa fa-fw fa-cogs"></i>&nbsp;Modifier le groupe
+	</button>
+
+	<button v-if="groupSelected" class="button" v-on:click="showAction('deleteGroup')">
+		<i class="fa fa-fw fa-times"></i>&nbsp;Supprimer le groupe
+	</button>
+
+	<button v-else class="button" disabled>
+		<i class="fa fa-fw fa-times"></i>&nbsp;Supprimer le groupe
+	</button>
+
+    <button v-if="groupSelected" class="button" v-on:click="showAction('nukeGroup')">
+        <i class="fa fa-fw fa-times"></i>&nbsp;Purger les groupes
+    </button>
+    
+    <button v-else class="button" disabled>
+        <i class="fa fa-fw fa-times"></i>&nbsp;Purger les groupes
+    </button>
+    
+	<button v-if="groupSelected" class="button" v-on:click="showAction('addUser')">
+		<i class="fa fa-fw fa-user-plus"></i>&nbsp;Ajouter des utilisateurs
+	</button>
+
+	<button v-else class="button" disabled>
+		<i class="fa fa-fw fa-user-plus"></i>&nbsp;Ajouter des utilisateurs
+	</button>
+
+	<button class="button" v-if="!shown('more')" v-on:click="showAction('more')">
+		<i class="fa fa-fw fa-bars"></i>&nbsp;Plus ...
+	</button>
+
+	<div v-if="shown('more')">
+
+		<button v-if="groupSelected" class="button" v-on:click="showAction('editLimits')">
+			<i class="fa fa-fw fa-balance-scale"></i>&nbsp;Limitations du groupe
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-balance-scale"></i>&nbsp;Limitations du groupe
+		</button>
+
+		<button v-if="groupSelected" class="button" v-on:click="showAction('vmTemplates')">
+			<i class="fa fa-fw fa-archive"></i>&nbsp;VMs pré-configurées
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-archive"></i>&nbsp;VMs pré-configurées
+		</button>
+
+		<button v-if="groupSelected" class="button" v-on:click="showAction('networks')">
+			<i class="fa fa-fw fa-sitemap"></i>&nbsp;Réseaux
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-sitemap"></i>&nbsp;Réseaux
+		</button>
+
+		<button v-if="groupSelected" class="button" v-on:click="showAction('groupShutdown')">
+			<i class="fa fa-fw fa-power-off"></i>&nbsp;Éteindre les VMs
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-power-off"></i>&nbsp;Éteindre les VMs
+		</button>
+	</div>
+	<div v-if="userSelected !== undefined">
+
+		<hr/>
+
+		<h3>{{userSelected.common_name}}</h3>
+
+		<button class="button" v-on:click="showAction('deleteUser')">
+			<i class="fa fa-fw fa-user-times"></i>&nbsp;Supprimer l'utilisateur
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-user-times"></i>&nbsp;Supprimer l'utilisateur
+		</button>
+
+		<button class="button" v-on:click="showAction('changeUser')">
+			<i class="fa fa-fw fa-user"></i>&nbsp;Modifier l'utilisateur
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-user"></i>&nbsp;Modifier l'utilisateur
+		</button>
+
+	</div>
+
+	<div v-if="shown('editGroup')">
+		<hr/>
+		<h3>Modification du groupe</h3>
+
+		<label>Nom</label>
+		<input v-model="newGroupInfo.name" placeholder="Nom du groupe"/>
+		<label>Description</label>
+		<textarea v-model="newGroupInfo.desc" placeholder="Description"></textarea>		
+
+		<button v-sq-loader class="button-orange" v-on:click="editGroup">
+			<i class="fa fa-fw fa-check"></i>&nbsp;Modifier le groupe
+		</button>
+	</div>
+
+	<div v-if="shown('groupShutdown')">
+		<hr/>
+		<h3>Exctinction des VMs</h3>
+		<p>
+			Êtes vous sûr de vouloir éteindre toute les VMs du groupe ? Ceci pourrait interrompre du travail en cours.
+		</p>
+
+		<button v-sq-loader class="button-red" v-on:click="shutdownGroup">
+			<i class="fa fa-fw fa-power-off"></i>&nbsp;Éteindre les VMs
+		</button>
+	</div>
+
+	<div v-if="shown('vmTemplates')">
+		<hr/>
+		<h3>VMs pré-configurées</h3>
+
+		<label>Machines mise à disposition du groupe</label>
+
+		<table class="networksActionList">
+			<tr>
+				<th>Machine</th>
+				<th>Actions</th>
+			</tr>
+			<tr v-if="!vmTemplates.linked.length">
+				<td colspan="2">Aucune machine à disposition</td>
+			</tr>
+			<tr v-for="vmTemplate in vmTemplates.linked">
+				<td> {{vmTemplate.name}} </td>
+				<td v-sq-loader class="networkAction delete" v-on:click="unlinkVMTemplate(vmTemplate.vm)"><i class="fa fa-fw fa-times"></i></td>
+			</tr>
+
+		</table>
+
+		<label>Nouvelle machine à disposition</label>
+		<select v-model="vmTemplates.newTemplateKey">
+			<option v-for="vmTemplate in vmTemplates.available" v-bind:value="vmTemplate.vm">{{vmTemplate.name}}</option>
+		</select>
+
+		<button v-sq-loader class="button" v-if="vmTemplates.newTemplateKey !== null" v-on:click="linkVMTemplate">
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Rendre disponible la machine
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Rendre disponible la machine
+		</button>
+	</div>
+
+	<div v-if="shown('networks')">
+		<hr/>
+		<h3>Réseaux</h3>
+
+		<label>Réseaux liés au groupe</label>
+
+		<table class="networksActionList">
+			<tr>
+				<th>Réseau</th>
+				<th>Actions</th>
+			</tr>
+			<tr v-if="!groupNetworks.linked.length">
+				<td colspan="2">Aucun réseau à disposition</td>
+			</tr>
+			<tr v-for="network in groupNetworks.linked">
+				<td> {{network.name}} </td>
+				<td v-sq-loader class="networkAction delete" v-on:click="unlinkNetwork(network.id, $event)"><i class="fa fa-fw fa-times"></i></td>
+			</tr>
+
+		</table>
+
+		<label>Nouveau réseau à disposition</label>
+		<select v-model="groupNetworks.newNetworkKey">
+			<option v-for="network in groupNetworks.available" v-bind:value="network.id">{{network.name}}</option>
+		</select>
+
+		<button v-sq-loader class="button" v-if="groupNetworks.newNetworkKey !== null" v-on:click="addNetwork">
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Rendre disponible le réseau
+		</button>
+
+		<button v-else class="button" disabled>
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Rendre disponible le réseau
+		</button>
+	</div>
+
+	<div v-if="shown('editLimits')">
+		<hr/>
+		<div>
+			<h3>Modifier les limitations du groupe</h3>
+
+			<label>Machines Virtuelles</label>
+			<div class="incrementable">
+				<input v-model="groupLimits.vm_count" />
+				<button target="groupLimits.vm_count" step="1" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="groupLimits.vm_count" step="-1" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<label>CPU(s)</label>
+			<div class="incrementable">
+				<input v-model="groupLimits.cpu_count" />
+				<button target="groupLimits.cpu_count" step="1" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="groupLimits.cpu_count" step="-1" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<label>RAM (MiB)</label>
+			<div class="incrementable">
+				<input v-model="groupLimits.memory_size" />
+				<button target="groupLimits.memory_size" step="1024" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="groupLimits.memory_size" step="-1024" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<label>Stockage (MiB)</label>
+			<div class="incrementable">
+				<input v-model="groupLimits.disk_storage"/>
+				<button target="groupLimits.disk_storage" step="2048" v-on:click="incrementField">
+					<i class="fa fa-plus"></i>
+				</button>
+				<button target="groupLimits.disk_storage" step="-2048" v-on:click="incrementField">
+					<i class="fa fa-minus"></i>
+				</button>
+			</div>
+
+			<button class="button-orange" v-on:click="changeLimits">
+				<i class="fa fa-fw fa-check"></i>&nbsp;Modifier les limitations
+			</button>
+
+			<button class="button-red" v-on:click="resetLimits">
+				<i class="fa fa-fw fa-undo"></i>&nbsp;Valeurs par défaut
+			</button>
+		</div>
+	</div>
+
+	<div v-if="shown('createGroup')">
+		<hr/>
+		<h3>Création d'un groupe</h3>
+
+		<label>Nom</label>
+		<input v-model="newGroup.name" placeholder="Nom du groupe"/>
+		<label>Description</label>
+		<textarea v-model="newGroup.description" placeholder="Description"></textarea>
+		<label>Groupe parent</label>
+		<selectlist :default="true" :list="allGroups" v-model="newGroup.id_parent_group"></selectlist>
+
+		<button class="button-green" v-on:click="createGroup">
+			<i class="fa fa-fw fa-plus"></i>&nbsp;Créer le groupe
+		</button>
+	</div>
+
+	<div v-if="shown('deleteGroup')">
+		<hr/>
+		<h3>Suppression du groupe</h3>
+		<p>
+			Êtes vous sûr de vouloir supprimer le groupe ?
+		</p>
+
+		<button class="button-red" v-on:click="deleteGroup">
+			<i class="fa fa-fw fa-times"></i>&nbsp;Supprimer le groupe
+		</button>
+	</div>
+
+    <div v-if="shown('nukeGroup')">
+        <hr/>
+        <h3>Purge des groupes</h3>
+        <p>
+            Êtes vous sûr de vouloir purger les groupes ? (Cela va supprimer les VMs et les utilisateurs présents dans les groupes sous-jacent)
+        </p>
+        
+        <button class="button-red" v-on:click="nukeGroup">
+            <i class="fa fa-fw fa-times"></i>&nbsp;Purger les groupes
+        </button>
+    </div>
+    
+	<div v-if="shown('addUser')">
+		<hr/>
+		<div>
+			<h3>Ajout d'utilisateur</h3>
+
+			<label>Recherche</label>
+			<i class="fa fa-fw fa-fw fa-search-plus" style="width:8%;"></i>
+			<input style="display: inline-block; width:90%;" v-on:input="searchUser" v-model="userSearch.query" placeholder="Recherche ..."/>
+
+			<div v-if="userSearch.results.length !== 0">
+				<label>À ajouter</label>
+				<select v-model="userSearch.selected">
+					<option  v-for="(result, index) in userSearch.results" v-bind:value="result.id">{{result.common_name}}</option>
+				</select>
+			</div>
+
+			<button class="button-green" v-on:click="addUserToGroup">
+				<i class="fa fa-fw fa-user-plus"></i>&nbsp;Ajouter au groupe
+			</button>
+		</div>
+	</div>
+
+	<div v-if="shown('deleteUser')">
+		<hr/>
+		<h3>Suppression de l'utilisateur</h3>
+		<p>
+			Êtes vous sûr de vouloir supprimer l'utilisateur de ce groupe ?
+		</p>
+
+		<button class="button-red" v-on:click="deleteUser">
+			<i class="fa fa-fw fa-user-times"></i>&nbsp;Supprimer l'utilisateur
+		</button>
+	</div>
+
+	<div v-if="shown('changeUser')">
+		<hr/>
+		<div>
+			<h3>Modifier l'utilisateur</h3>
+
+			<label>Type</label>
+			<select  v-model="editedType">
+				<option v-for="key in allTypes" v-bind:value="key">{{misc.humanize.userType[key]}}</option>
+			</select>
+
+			<button class="button-orange" v-on:click="changeUser">
+				<i class="fa fa-fw fa-user"></i>&nbsp;Modifier l'utilisateur
+			</button>
+		</div>
+	</div>
+</div>
+

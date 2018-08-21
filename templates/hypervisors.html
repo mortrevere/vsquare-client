@@ -1,0 +1,26 @@
+<loader v-if="model.length === 0"></loader>
+
+<ul v-else class="main-item-list" id="hypervisors-list">
+	<li v-for="hypervisor in model">
+		<div class="name">
+			{{ hypervisor.host }}
+		</div>
+		<i class="fa fa-server fa-3x"></i>
+
+		<table>
+			<tr class="ip">
+				<td><i class="fa fa-fw fa-id-card-o"></i>&nbsp;</td>
+				<td>{{ hypervisor.name }}</td>
+			</tr>
+			<tr class="power" v-bind:class="hypervisor.displayPower.state">
+				<td><i class="fa fa-fw fa-power-off"></i>&nbsp;</td>
+				<td>{{ hypervisor.displayPower.text }}</td>
+			</tr>
+			<tr class="connection" v-bind:class="hypervisor.displayConnection.state">
+				<td><i class="fa fa-fw fa-plug"></i>&nbsp;</td>
+				<td>{{ hypervisor.displayConnection.text }}</td>
+			</tr>
+		</table>
+
+	</li>
+</ul>

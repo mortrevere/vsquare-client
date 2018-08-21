@@ -1,0 +1,24 @@
+<div id="logs">
+
+	<!-- Barre de recherche -->
+	<form id="search" v-on:submit.prevent="search">
+		<label for="query"><i @click="search()" class="fa fa-search"></i></label>
+		<input placeholder="Recherche ..." class="wrapper" name="query" v-model="searchQuery"/>
+
+		<div v-if="empty">
+			Aucun journaux
+		</div>
+		<div v-else>
+
+			<logs-grid
+			:data="gridData"
+			:columns="gridColumns"></logs-grid>
+
+			<div class="page-nav">
+				<span :class="{disabled:firstPage}"> <i title="première page" @click="goFirstPage()" class="fa fa-fast-backward"></i> <i title="10 pages avant" @click="goFastPreviousPage()" class="fa fa-backward"></i> <i title="page précedente" @click="goPreviousPage()" class="fa fa-step-backward"></i> </span>
+				<h4>{{page + 1}} / {{totalPage}}</h4>
+				<span :class="{disabled:lastPage}"> <i title="page suivante" @click="goNextPage()" class="fa fa-step-forward"></i> <i title="10 pages après" @click="goFastNextPage()" class="fa fa-forward"></i> <i title="dernière page" @click="goLastPage()" class="fa fa-fast-forward"></i> </span>
+			</div>
+		</div>
+
+</div>

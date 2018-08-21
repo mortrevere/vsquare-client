@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<script src="res/vue.js"></script>
+		<script src="res/jquery-3.3.1.min.js"></script>
+		<script src="res/notify.min.js"></script>
+		<script src="scripts/cookies.js"></script>
+		<script src="scripts/globals.js"></script>
+		<link rel="stylesheet" type="text/css" href="style/ui.css">
+		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="style/fa/css/font-awesome.min.css"/>
+
+		<link rel="icon" type="image/png" href="style/vsquaresquare.png" />
+
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+
+		<title>vSquare | Dashboard</title>
+		<script>
+			//check for authentication, redirect to login page
+			//security wise, this could be overidden
+			//but loading the whole client is useless if you don't get an auth token
+			if (!cookies.get('X-Token')) {
+				misc.redirect('login.html');
+			} else {
+				ajax.call('GET', '/auth', function() {
+				}, function() {
+					misc.redirect('login.html');
+				});
+			}
+		</script>
+
+	</head>
+	<body>
+
+		<div id="app-vsquare">
+			<nav>
+				<img v-on:click="loadApp('dashboard')" alt="logo" src="style/vsquaresquare.png"/>
+				<h1 v-on:click="loadApp('dashboard')">vSquare</h1>
+
+				<ul id="main-menu">
+					<li v-bind:class="{ active: currentAppId === 'vms' }" v-on:click="loadApp('vms')">
+						<i class="fa fa-home"></i>
+						VMs
+					</li>
+					<li v-if="user.admin" v-bind:class="{ active: currentAppId === 'groups' }" v-on:click="loadApp('groups')">
+						<i class="fa fa-users"></i>
+						Groupes
+					</li>
+					<li v-if="user.admin" v-bind:class="{ active: currentAppId === 'networks' }" v-on:click="loadApp('networks')">
+						<i class="fa fa-sitemap"></i>
+						Réseaux
+					</li>
+					<li v-if="user.admin" v-bind:class="{ active: currentAppId === 'hypervisors' }" v-on:click="loadApp('hypervisors')">
+						<i class="fa fa-server"></i>
+						Hyperviseurs
+					</li>
+					<li v-if="user.admin" v-bind:class="{ active: currentAppId === 'datastores' }" v-on:click="loadApp('datastores')">
+						<i class="fa fa-database"></i>
+						Datastores
+					</li>
+					<li v-if="user.admin" v-bind:class="{ active: currentAppId === 'logs' }" v-on:click="loadApp('logs')">
+						<i class="fa fa-align-left"></i>
+						Journaux
+					</li>
+
+				</ul>
+
+				<div v-if="!help.ignoredApps[currentAppId]" id="helpButton" title="Aide" v-on:click="displayHelp">
+					<i class="fa fa-question-circle"></i>
+				</div>
+
+				<div id="logout" title="Deconnexion" v-on:click="logout">
+					<span>{{user.cn}}</span>
+					<i class="fa fa-sign-out"></i>
+				</div>
+			</nav>
+
+			<div id="help" v-html="help.content" v-if="help.show"></div>
+
+			<div id="current-app">
+				<div id="left-panel"></div>
+				<div id="middle-panel"></div>
+				<div id="right-panel"></div>
+			</div>
+
+		</div>
+
+		<!-- General components -->
+		<script type="text/x-template" class="tmpl" id="item-template"></script>
+		<script type="text/x-template" class="tmpl" id="vsquare-loader-template"></script>
+		<script type="text/x-template" class="tmpl" id="progress-template"></script>
+
+		<!-- Apps templates & components -->
+		<script type="text/x-template" class="tmpl" id="dashboard-template"></script>
+		<script type="text/x-template" class="tmpl" id="hypervisors-template"></script>
+		<script type="text/x-template" class="tmpl" id="datastores-template"></script>
+
+		<script type="text/x-template" class="tmpl" id="vms-template"></script>
+		<script type="text/x-template" class="tmpl" id="vm-actions-template"></script>
+
+		<script type="text/x-template" class="tmpl" id="groups-template"></script>
+		<script type="text/x-template" class="tmpl" id="groups-grid-template"></script>
+		<script type="text/x-template" class="tmpl" id="groups-actions-template"></script>
+		<script type="text/x-template" class="tmpl" id="select-list-template"></script>
+
+		<script type="text/x-template" class="tmpl" id="logs-template"></script>
+		<script type="text/x-template" class="tmpl" id="logs-grid-template"></script>
+
+		<script type="text/x-template" class="tmpl" id="networks-template"></script>
+		<script type="text/x-template" class="tmpl" id="network-actions-template"></script>
+
+		<script src="scripts/ui.js"></script>
+		<script src="scripts/item.js"></script>
+		<script src="scripts/dashboard.js"></script>
+		<script src="scripts/hypervisors.js"></script>
+		<script src="scripts/datastores.js"></script>
+		<script src="scripts/logs.js"></script>
+		<script src="scripts/vms.js"></script>
+		<script src="scripts/groups.js"></script>
+		<script src="scripts/upload.js"></script>
+		<script src="scripts/networks.js"></script>
+
+		<!-- Init Vue.js when everything is loaded (see ui.js) -->
+		<script>
+			app.start();
+		</script>
+	</body>
+
+</html>

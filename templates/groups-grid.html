@@ -1,0 +1,25 @@
+<table class="group-grid">
+	<thead>
+		<tr>
+			<th v-for="key in columns"
+			@click="sortBy(key)"
+			:class="{ active: sortKey == key, isType: key == 'type' }">
+			 
+			 
+			 <!--<div v-if="key !== 'type'">-->{{ misc.humanize.userColumns[key] }}
+			 	<i v-if="sortKey == key" class="fa fa-fw" :class="sortOrders[key] > 0 ? 'fa-caret-up' : 'fa-caret-down'"></i>
+			 	<span v-else class="fa fa-fw"></span>
+			 
+			 </th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr v-for="entry in filteredData"
+		v-on:click="userClicked(entry)">
+			<td :class="{ active: sortKey == key, isType: key == 'type' }" v-for="key in columns">
+				<span v-if="key === 'type'"> <i v-bind:title="misc.humanize.userType[entry[key]]" v-bind:class="misc.html.userTypeIcon[entry[key]]"></i> </span>
+				<span v-else>{{entry[key]}}</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

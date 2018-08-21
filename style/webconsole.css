@@ -1,0 +1,155 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font: 15px Arial, sans-serif;
+	overflow: hidden;
+	background: #000;
+	color: #fff;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+table {
+	border-collapse: separate;
+	border-spacing: 0 5px;
+	margin-top: -5px;
+}
+#app-vsquare {
+	font-family: 'Lato';
+	margin-bottom: 24px;
+}
+#app-vsquare nav {
+	background-color: #350316;
+}
+#app-vsquare nav img {
+	height: 46px;
+	position: absolute;
+	top: 9px;
+	cursor: pointer;
+}
+
+#app-vsquare h1 {
+	color: #fff;
+	cursor: pointer;
+}
+#app-vsquare nav {
+	width: 100%;
+	border-bottom: 1px solid #F3508F;
+	padding: 12px;
+	position: relative;
+	height: 64px;
+	padding-top: 16px;
+	color: #fff;
+}
+#app-vsquare nav:hover {
+	border-bottom: 1px solid #F3508F;
+	transition: all 200ms;
+}
+#app-vsquare nav h1 {
+	width: 200px;
+	display: inline-block;
+	margin-left: 57px;
+}
+#app-vsquare nav #logout {
+	display: inline-block;
+	text-align: right;
+	position: absolute;
+	right: 0;
+	font-size: 18px;
+	vertical-align: middle;
+	line-height: 32px;
+	cursor: pointer;
+	top: 0;
+	padding: 16px 12px 0 12px;
+	height: 100%;
+}
+#app-vsquare nav #logout:hover {
+}
+#app-vsquare nav #logout i {
+}
+#app-vsquare nav #logout span {
+	margin-right: 12px;
+}
+
+#app-vsquare #main-dash-menu {
+	list-style-type: none;
+	/*! width:900px; */
+	/*! margin:auto; */
+	display: inline-block;
+}
+
+#app-vsquare .header-wrapper {
+	width: 100%;
+	/*background-color: #F6F6F6;*/
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	text-align: center;
+}
+
+.app-header {
+	background-color: #fff;
+	padding: 48px;
+	text-align: left;
+}
+
+.app-header h2 {
+	margin-bottom: 4px;
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: absolute;
+	text-align: center;
+	background: #000;
+}
+
+#container canvas:focus {
+	outline: none;
+}
+
+.notifyjs-bootstrap-info {
+	border: 1px solid #FFF;
+	color: #FFF;
+	background-color: #000;
+}
+
+.notifyjs-bootstrap-error {
+	border: 1px solid #FFF;
+	color: #FFF;
+	background-color: #A51D0C;
+}
+
+.notifyjs-bootstrap-success {
+	border: 1px solid #FFF;
+	color: #FFF;
+	background-color: #24902D;
+}
+.notifyjs-bootstrap-base {
+	font-weight: bold;
+	text-shadow: none;
+	white-space: nowrap;
+}
+
+#helpers {
+	position: absolute;
+	left: 24px;
+	top: 90px;
+	z-index: 100;
+}
+
+#helpers input, #helpers select, #helpers button {
+	height: 31px;
+	margin-bottom:6px;
+}
+
+#helpers input {
+	width:31px;
+}

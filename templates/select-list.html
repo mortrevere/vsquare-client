@@ -1,0 +1,5 @@
+<select v-bind:value="value" v-on:input="updateValue($event.target.value)">
+	<option v-for="opt in list" v-bind:value="opt.value">{{opt.display}}</option>
+	
+</select>
+

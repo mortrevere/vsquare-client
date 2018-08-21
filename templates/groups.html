@@ -1,0 +1,44 @@
+<div v-if="notSelected" class="header-wrapper main-item-list" id="vms-list">
+
+	<div class="empty-notice app-header">
+		<h2>Aucun groupe séléctionné</h2>
+
+		<p>
+			<i class="fa fa-warning"></i>&nbsp;&nbsp;Sélectionnez un groupe à gauche pour l'ouvrir&nbsp;&nbsp;<i class="fa fa-warning"></i>
+		</p>
+
+	</div>
+</div>
+<div v-else>
+	
+	<div class="app-header">
+		<h2>{{actualGroup.name}}</h2>
+
+		<p>
+			{{actualGroup.description}}
+		</p>
+
+	</div>
+	
+	<div id="group">
+	<div>
+		<!-- Informations du groupe: nom et description -->
+		<br/>
+		<!-- Barre de recherche -->
+		<form id="search" onsubmit="return false;">
+			<label for="query"><i class="fa fa-search"></i></label>
+			<input placeholder="Recherche ..." class="wrapper" name="query" v-model="searchQuery"/>
+
+		</form>
+		<!-- Tableau -->
+		<group-grid
+		:data="gridData"
+		:columns="gridColumns"
+		:filter-key="searchQuery"></group-grid>
+		
+		<div v-if="empty">
+			Ce groupe ne comporte pas d'utilisateurs
+		</div>
+	</div>
+</div>
+</div>

@@ -1,0 +1,18 @@
+<li>
+	<div :class="{selected : selected}" @click="toggle">
+
+		<span v-if="isFolder"><i v-if="open" class="fa fa-minus" ></i> <i v-else class="fa fa-plus" ></i></span>
+		<span v-else> <i class="fa fa-caret-down" v-if="open"></i> <i class="fa fa-caret-right" v-else></i> </span>
+		&nbsp;
+		{{ model.displayName }}
+
+	</div>
+	<ul v-show="open" v-if="isFolder">
+		<item
+		class="item"
+		v-for="(model, index) in model.children"
+		:key="index"
+		:model="model"></item>
+		<!--<li class="add" @click="addChild">+</li>-->
+	</ul>
+</li>
